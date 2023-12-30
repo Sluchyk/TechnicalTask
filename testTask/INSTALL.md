@@ -4,6 +4,7 @@ Java 17
 Maven
 MySQL
 MySQL Workbench or any equivalent tool for managing MySQL databases
+Docker
 
 Database Configuration
 Create a MySQL database for the application:
@@ -35,6 +36,19 @@ Copy code
 spring.datasource.url=jdbc:mysql://localhost:3306/scraperjob
 spring.datasource.username=root
 spring.datasource.password=root
+
+run docker-compose file
+docker-compose.yml
+
+properties for docker
+spring.datasource.url=jdbc:mysql://mysql:3306/scrabjob
+spring.datasource.username=root
+spring.datasource.password=root
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+spring.jpa.hibernate.ddl-auto=create-drop
+
+
 Installation
 Clone the repository:
 
