@@ -6,9 +6,11 @@ import static com.example.testTask.job_scraper.HtmlElementsConstants.DATE_POSTED
 import static com.example.testTask.job_scraper.HtmlElementsConstants.DESCRIPTION_ELEMENT;
 import static com.example.testTask.job_scraper.HtmlElementsConstants.HTML_ATTRIBUTE_HREF;
 import static com.example.testTask.job_scraper.HtmlElementsConstants.HTML_ATTRIBUTE_SRC;
+import static com.example.testTask.job_scraper.HtmlElementsConstants.HTML_TAG_IMAGE;
 import static com.example.testTask.job_scraper.HtmlElementsConstants.JOB_DESCRIPTION_PAGE;
 import static com.example.testTask.job_scraper.HtmlElementsConstants.LABOR_FUNCTION_ELEMENT;
 import static com.example.testTask.job_scraper.HtmlElementsConstants.LOGO_URL_ELEMENT;
+import static com.example.testTask.job_scraper.HtmlElementsConstants.ORGANIZATION_TITLE_ELEMENT;
 import static com.example.testTask.job_scraper.HtmlElementsConstants.URL_TO_ORGANIZATION_ELEMENT;
 import com.example.testTask.job_scraper.httpClient.HttpClientBuilder;
 import com.example.testTask.job_scraper.model.Job;
@@ -44,13 +46,14 @@ public class FullJobInformationParser {
         return jobs;
     }
 
-    private Job parseJobInformation(Elements elements,JobItem jobItem) {
+    private Job parseJobInformation(Elements elements,
+                                    JobItem jobItem) {
         return new Job(
                 jobItem.getUrlApplication(),
                 jobItem.getJobTitle(),
                 parseUrlToOrganization(elements,jobItem),
                 parseLogoUrl(elements),
-                jobItem.getOrganizationTitle(),
+                parseOrganizationTitle(elements),
                 parseLaborFunction(elements),
                 parseAddress(elements),
                 parseDatePosted(elements),
@@ -59,22 +62,28 @@ public class FullJobInformationParser {
         );
     }
 
-    private String parseUrlToOrganization(Elements element,JobItem jobItem) {
-        String srcLogoUrl = null;
-        Element logoUrl = element.select(URL_TO_ORGANIZATION_ELEMENT).first();
-        if(logoUrl != null) {
-            srcLogoUrl = logoUrl.attr(HTML_ATTRIBUTE_HREF);
+    private String parseOrganizationTitle(Elements elements) {
+        Element organizationTitleElement = elements.select(ORGANIZATION_TITLE_ELEMENT).first();
+        return organizationTitleElement != null ? organizationTitleElement.text() : NOT_FOUND;
+    }
+
+    private String parseUrlToOrganization(Elements element,
+                                          JobItem jobItem) {
+        String hrefUrl = null;
+        Element hrefUrlElement = element.select(URL_TO_ORGANIZATION_ELEMENT).first();
+        if (hrefUrlElement != null) {
+           hrefUrl = hrefUrlElement.attr(HTML_ATTRIBUTE_HREF);
         }
-        return srcLogoUrl != null ? logoUrl.text() : jobItem.getUrlApplication();
+        return hrefUrl != null ? hrefUrl : jobItem.getUrlApplication();
     }
 
     private String parseLogoUrl(Elements element) {
         String srcLogoUrl = null;
         Element logoUrl = element.select(LOGO_URL_ELEMENT).first();
         if(logoUrl != null) {
-            srcLogoUrl = logoUrl.attr(HTML_ATTRIBUTE_SRC);
+            srcLogoUrl = logoUrl.select(HTML_TAG_IMAGE).attr(HTML_ATTRIBUTE_SRC);
         }
-        return srcLogoUrl != null ? logoUrl.text() : NOT_FOUND;
+        return srcLogoUrl != null ? srcLogoUrl : NOT_FOUND;
     }
 
     private String parseLaborFunction(Elements element) {

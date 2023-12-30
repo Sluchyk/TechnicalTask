@@ -3,13 +3,11 @@ package com.example.testTask.job_scraper;
 import static com.example.testTask.MessageConstants.NOT_FOUND;
 import static com.example.testTask.MessageConstants.ZERO_JOBS_FOUND;
 import static com.example.testTask.job_scraper.HtmlElementsConstants.DATA_TEST_ID_READ_MODE;
-import static com.example.testTask.job_scraper.HtmlElementsConstants.HTML_ATTRIBUTE_CONTENT;
 import static com.example.testTask.job_scraper.HtmlElementsConstants.HTML_ATTRIBUTE_HREF;
 import static com.example.testTask.job_scraper.HtmlElementsConstants.JOB_ITEM_ELEMENT;
 import static com.example.testTask.job_scraper.HtmlElementsConstants.JOB_ITEM_URL;
 import static com.example.testTask.job_scraper.HtmlElementsConstants.JOB_TAG_ELEMENT;
 import static com.example.testTask.job_scraper.HtmlElementsConstants.JOB_TITLE_ELEMENT;
-import static com.example.testTask.job_scraper.HtmlElementsConstants.ORGANIZATION_TITLE_ELEMENT_SHORT;
 import static com.example.testTask.job_scraper.UrlConstants.URL_JOB_WEB_PAGE;
 import com.example.testTask.job_scraper.httpClient.HttpClientBuilder;
 import com.example.testTask.job_scraper.model.InformationAboutJobRequest;
@@ -62,8 +60,7 @@ public class InformationFromJobItemParser {
                 jobItemList.add(new JobItem(
                         getJobTags(element),
                         getUrlForApplication(element),
-                        parseJobTitle(document),
-                        parseOrganizationTitle(document)));
+                        parseJobTitle(element)));
             }
         }
         return jobItemList;
@@ -107,8 +104,5 @@ public class InformationFromJobItemParser {
             jobTitle = jobTitleElement.text();
         }
         return jobTitle;
-    }
-    private String parseOrganizationTitle(Element element){
-        return element.selectFirst(ORGANIZATION_TITLE_ELEMENT_SHORT).attr(HTML_ATTRIBUTE_CONTENT);
     }
 }
