@@ -13,12 +13,7 @@ The application automatically crawls jobs.techstars.com to gather relevant job p
 User-Friendly Presentation:
 
 Scraped data is stored in a MySQL database and presented in a clear and user-friendly format, displaying key details of each job listing.
-Filter and Sort Options:
+Filter:
 
-Users can filter the results based on criteria such as job location or posting date.
-Sorting options are available to help users efficiently find and explore job opportunities tailored to their preferences.
+Users can filter the results based on criteria such as job location.
 Getting Started
-Prerequisites
-Java 17
-Maven
-MySQL
