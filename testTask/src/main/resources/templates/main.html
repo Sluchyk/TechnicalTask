@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Task</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+        }
+
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown:hover .btn {
+            background-color: #007bff;
+        }
+    </style>
+
+</head>
+<body class="container">
+
+<h1 class="mt-5">Select Options:</h1>
+
+<form action="/job" method="get">
+    <div class="d-flex">
+        <div class="dropdown mr-2">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="jobFunctionDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Job Function
+            </button>
+            <div class="dropdown-menu" aria-labelledby="jobFunctionDropdown">
+                <select class="form-control" name="selectedJobFunction" multiple>
+                    <option value="IT">IT</option>
+                    <option value="Accounting & Finance">Accounting & Finance</option>
+                    <option value="IT">IT</option>
+                    <option value="Accounting & Finance">Accounting & Finance</option>
+                    <option value="Administration">Administration</option>
+                    <option value="Customer Service">Customer Service</option>
+                    <option value="Data Science">Data Science</option>
+                    <option value="Design">Design</option>
+                    <option value="Legal">Legal</option>
+                    <option value="Marketing & Communications">Marketing & Communications</option>
+                    <option value="Operations">Operations</option>
+                    <option value="People & HR">People & HR</option>
+                    <option value="Other Engineering">Other Engineering</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="locationDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Location
+            </button>
+            <div class="dropdown-menu" aria-labelledby="locationDropdown">
+                <select class="form-control" name="selectedLocation" multiple>
+                    <option value="Remote">Remote</option>
+                    <option value="London, UK">London, UK</option>
+                    <option value="Remote">Remote</option>
+                    <option value="London, UK">London, UK</option>
+                    <option value="Administration">New York, NY, USA</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">Search</button>
+</form>
+
+
+<div>
+    <p>Total Jobs: <span th:text="${total_jobs}"></span></p>
+</div>
+<div th:if="${not #lists.isEmpty(jobs)}" class="mt-5">
+    <h2>Результати:</h2>
+    <div th:each="job: ${jobs}" class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title" th:if="${not #strings.equals(job.positionName, 'NOT_FOUND')}" th:text="${job.positionName}"></h5>
+            <p class="card-text" th:if="${not #strings.equals(job.organizationTitle, 'NOT_FOUND')}" th:text="${job.organizationTitle}"></p>
+            <p class="card-text">
+                <a th:href="${job.urlToOrganization}" href="${job.urlToOrganization}" class="btn btn-primary">Apply</a>
+            </p>
+            <p class="card-text" th:if="${not #strings.equals(job.laborFunction, 'NOT_FOUND')}" th:text="${job.laborFunction}"></p>
+            <p class="card-text" th:if="${not #strings.equals(job.address, 'NOT_FOUND')}" th:text="${job.address}"></p>
+            <p class="card-text" th:if="${not #strings.equals(job.postedDate, 'NOT_FOUND')}" th:text="${job.postedDate}"></p>
+            <p class="card-text" th:if="${not #strings.equals(job.description, 'NOT_FOUND')}" th:text="${job.description}"></p>
+            <p class="card-text" th:text="${job.tagName}"></p>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+</body>
+</html>
