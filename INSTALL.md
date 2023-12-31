@@ -41,7 +41,7 @@ run docker-compose file
 docker-compose.yml
 
 properties for docker
-spring.datasource.url=jdbc:mysql://mysql:3306/scrabjob
+spring.datasource.url=jdbc:mysql://mysqldb:3306/scrabjob
 spring.datasource.username=root
 spring.datasource.password=root
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
