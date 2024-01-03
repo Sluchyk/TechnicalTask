@@ -11,10 +11,8 @@ Create a MySQL database for the application:
 
 sql
 Copy code
-CREATE DATABASE scraperjob;
-
+CREATE DATABASE IF NOT EXISTS your_database_name;
 DROP TABLE IF EXISTS job_entity;
-
 CREATE TABLE IF NOT EXISTS job_entity (
 id BIGINT PRIMARY KEY AUTO_INCREMENT,
 job_page_url VARCHAR(255),
@@ -28,14 +26,22 @@ posted_date BIGINT,
 description LONGTEXT,
 tag_name VARCHAR(255)
 );
+ALTER TABLE job_entity CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE job_entity MODIFY COLUMN description longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 
 Update the application.properties file with your MySQL database configuration:
 
 properties
 Copy code
-spring.datasource.url=jdbc:mysql://localhost:3306/scraperjob
+spring.datasource.url=jdbc:mysql://localhost:3306/scrapjob
 spring.datasource.username=root
 spring.datasource.password=root
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+spring.jpa.properties.hibernate.connection.characterEncoding=utf8mb4
+spring.jpa.properties.hibernate.connection.useUnicode=true
+spring.jpa.hibernate.ddl-auto=update
+
 
 run docker-compose file
 docker-compose.yml
@@ -46,7 +52,10 @@ spring.datasource.username=root
 spring.datasource.password=root
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
-spring.jpa.hibernate.ddl-auto=create-drop
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.properties.hibernate.connection.characterEncoding=utf8mb4
+spring.jpa.properties.hibernate.connection.useUnicode=true
+spring.jpa.hibernate.ddl-auto=update
 
 
 Installation

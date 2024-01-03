@@ -1,3 +1,4 @@
+CREATE DATABASE IF NOT EXISTS your_database_name;
 DROP TABLE IF EXISTS job_entity;
 CREATE TABLE IF NOT EXISTS job_entity (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -12,3 +13,5 @@ CREATE TABLE IF NOT EXISTS job_entity (
     description LONGTEXT,
     tag_name VARCHAR(255)
 );
+ALTER TABLE job_entity CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE job_entity MODIFY COLUMN description longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
