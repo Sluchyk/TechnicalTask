@@ -28,22 +28,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class FullJobInformationParser {
 
-    public List<Job> getFullInfoAboutJobs(List<JobItem> jobItemList) throws IOException {
-        List<Job> jobs = new ArrayList<>();
-
-        for (JobItem jobItem : jobItemList) {
-            Response response = new HttpClientBuilder()
-                    .buildRequest(jobItem.getUrlApplication());
-            if (response.body() == null) {
-                continue;
-            }
+    public Job getFullInfoAboutJobs(JobItem jobItem) {
+        try (Response response = new HttpClientBuilder()
+                .buildRequest(jobItem.getUrlApplication())) {
             Document document = Jsoup.parse(response.body().string());
             Elements elements = document.select(JOB_DESCRIPTION_PAGE);
-            jobs.add(parseJobInformation(
-                    elements,
-                    jobItem));
+          return parseJobInformation(elements,jobItem);
+        } catch (IOException e){
+            return  null;
         }
-        return jobs;
     }
 
     private Job parseJobInformation(Elements elements,
