@@ -1,6 +1,7 @@
 package com.example.testTask.job_scraper;
 
 import static com.example.testTask.MessageConstants.NOT_FOUND;
+import static com.example.testTask.MessageConstants.REQUEST_NOT_FOUND_EXCEPTION_METHOD;
 import static com.example.testTask.MessageConstants.ZERO_JOBS_FOUND;
 import static com.example.testTask.job_scraper.HtmlElementsConstants.DATA_TEST_ID_READ_MODE;
 import static com.example.testTask.job_scraper.HtmlElementsConstants.HTML_ATTRIBUTE_HREF;
@@ -18,6 +19,13 @@ import com.example.testTask.utils.ReferenceModifier;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 import okhttp3.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -30,23 +38,35 @@ public class InformationFromJobItemParser {
 
     private final JobFunctionEncoder jobFunctionEncoder;
     private final FullJobInformationParser fullJobInformationParser;
+    private final ExecutorService executorService;
+
     public InformationFromJobItemParser(JobFunctionEncoder jobFunctionEncoder, FullJobInformationParser fullJobInformationParser) {
         this.jobFunctionEncoder = jobFunctionEncoder;
         this.fullJobInformationParser = fullJobInformationParser;
+        this.executorService = Executors.newCachedThreadPool();
     }
 
-
-    public InformationAboutJobRequest findJobs(String[] jobFunction) throws IOException, NotFoundException {
-        Response response = new HttpClientBuilder().buildRequest(ReferenceModifier.createRequestUri(URL_JOB_WEB_PAGE, jobFunctionEncoder.encodeJobFunction(jobFunction)));
-        if (response.body() == null) {
-            return  new InformationAboutJobRequest(null,null);
-        }
+    public InformationAboutJobRequest findJobs(String[] jobFunction)  {
+        try
+            (Response response = new HttpClientBuilder().buildRequest(ReferenceModifier
+                .createRequestUri(URL_JOB_WEB_PAGE, jobFunctionEncoder.encodeJobFunction(jobFunction)))){
+            if(response.body()!=null) {
         Document document = Jsoup.parse(response.body().string());
-        response.close();
         List<JobItem> jobItemList = parseHtmlToJobItemObject(document);
         String totalNumberOfJobs = findNumberOfAllJobsPerRequest(document);
-        List<Job> jobList = fullJobInformationParser.getFullInfoAboutJobs(jobItemList);
+
+        List<CompletableFuture<Job>> jobFutures = jobItemList.parallelStream()
+                .map(jobItem -> CompletableFuture.supplyAsync(() -> fullJobInformationParser.getFullInfoAboutJobs(jobItem), executorService)).toList();
+
+        List<Job> jobList = jobFutures.stream()
+                .map(CompletableFuture::join)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
         return new InformationAboutJobRequest(jobList, totalNumberOfJobs);
+            } else throw  new NotFoundException(REQUEST_NOT_FOUND_EXCEPTION_METHOD);
+        } catch (IOException | NotFoundException e) {
+            return new InformationAboutJobRequest(new ArrayList<>(),"0");
+        }
     }
 
     private List<JobItem> parseHtmlToJobItemObject(Document document) throws NotFoundException {
@@ -54,16 +74,17 @@ public class InformationFromJobItemParser {
         if (elements.isEmpty()) {
             throw new NotFoundException(ZERO_JOBS_FOUND);
         }
-        List<JobItem> jobItemList = new ArrayList<>();
-        for (Element element : elements) {
-            if (element != null) {
-                jobItemList.add(new JobItem(
-                        getJobTags(element),
-                        getUrlForApplication(element),
-                        parseJobTitle(element)));
-            }
-        }
-        return jobItemList;
+        return elements.parallelStream()
+                .map(this::createJobItemFromElement)
+                .collect(Collectors.toList());
+    }
+
+    private JobItem createJobItemFromElement(Element element) {
+        return new JobItem(
+                getJobTags(element),
+                getUrlForApplication(element),
+                parseJobTitle(element)
+        );
     }
 
     private String getUrlForApplication(Element element) {

@@ -7,6 +7,7 @@ import com.example.testTask.job_scraper.model.InformationAboutJobRequest;
 import com.example.testTask.job_scraper.model.Job;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +28,7 @@ public class JobController {
     @GetMapping("/job")
     public String getJobs(@RequestParam(defaultValue = FIRST_DEFAULT_PATH_VARIABLE) String[] selectedJobFunction,
                           @RequestParam(required = false) String location,
-                          Model model) throws IOException, NotFoundException {
+                          Model model) {
 
         InformationAboutJobRequest jobRequestList = informationFromJobItemParser.findJobs(selectedJobFunction);
         jobService.save(jobRequestList.getJobItemList());
